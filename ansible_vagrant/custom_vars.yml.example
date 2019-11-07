@@ -1,0 +1,23 @@
+---
+
+percona_mysql_root_password: vagrant
+
+mysql_grants_deployment_user: root
+mysql_grants_deployment_password: "{{ percona_mysql_root_password }}"
+
+mysql_grants_databases:
+- name: mytest
+  encoding: utf8
+mysql_grants_users:
+- name: tesuser
+  password: testpassword
+  host: localhost
+  priv: 'mytest.*:ALL'
+  state: present
+- name: root # allow root access from outside
+  password: "{{ percona_mysql_root_password }}"
+  host: "%"
+  priv: '*.*:ALL'
+  state: present
+
+...

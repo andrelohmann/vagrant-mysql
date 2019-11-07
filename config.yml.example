@@ -1,0 +1,8 @@
+---
+configs:
+  server:
+    memory: "2048"
+    cpus: "2"
+    ip: "192.168.211.211"
+    domain: mysql.lokal
+...

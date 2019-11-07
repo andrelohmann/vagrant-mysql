@@ -1,0 +1,91 @@
+---
+- hosts: all
+  become: true
+  become_method: sudo
+
+  vars:
+    required_packages:
+    - git
+    - tcptraceroute
+    - nmap
+    - jq
+    - python3-mysqldb
+    required_python_packages: []
+    php_ini_settings:
+    - key: post_max_size
+      value: 512M
+    - key: upload_max_filesize
+      value: 512M
+    - key: max_execution_time
+      value: 600
+    - key: max_input_time
+      value: 600
+    apache_additional_modules:
+    - name: rewrite
+      state: present
+    apache_remove_default_vhost: False
+
+  pre_tasks:
+  - name: check for file custom_vars.yml
+    stat:
+      path: custom_vars.yml
+    register: stat_custom_vars
+  - name: load custom vars, if existent
+    include_vars:
+      file: custom_vars.yml
+    when: stat_custom_vars.stat.exists
+  - name: Install required packages
+    apt:
+      name: "{{ required_packages }}"
+      state: latest
+      dpkg_options: 'force-confnew,force-confdef'
+      autoclean: yes
+      autoremove: yes
+      update_cache: yes
+      cache_valid_time: 3600
+
+  roles:
+  - andrelohmann.root_colored_prompt
+  - andrelohmann.percona_mysql
+  - andrelohmann.mysql_grants
+
+  tasks:
+
+  - name: debconf for phpmyadmin
+    debconf:
+      name: phpmyadmin
+      question: "{{ item.question }}"
+      value: "{{ item.value }}"
+      vtype: "{{ item.vtype }}"
+    with_items:
+    - question: 'phpmyadmin/dbconfig-install'
+      value: 'true'
+      vtype: 'boolean'
+    - question: 'phpmyadmin/app-password-confirm'
+      value: '{{ percona_mysql_root_password }}'
+      vtype: 'password'
+    - question: 'phpmyadmin/mysql/admin-pass'
+      value: '{{ percona_mysql_root_password }}'
+      vtype: 'password'
+    - question: 'phpmyadmin/mysql/app-pass'
+      value: '{{ percona_mysql_root_password }}'
+      vtype: 'password'
+    - question: 'phpmyadmin/reconfigure-webserver'
+      value: 'apache2'
+      vtype: 'multiselect'
+
+  - name: install required packages
+    apt:
+      pkg: "{{ item }}"
+      state: latest
+      allow_unauthenticated: yes
+      autoclean: yes
+      autoremove: yes
+    with_items:
+    - git
+    - htop
+    - phpmyadmin
+
+
+
+...

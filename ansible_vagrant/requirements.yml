@@ -1,0 +1,7 @@
+---
+- andrelohmann.root_colored_prompt
+- andrelohmann.percona_mysql
+- andrelohmann.mysql_grants
+- andrelohmann.sury_php
+- andrelohmann.apache_php
+...
