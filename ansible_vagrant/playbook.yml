@@ -11,19 +11,6 @@
     - jq
     - python3-mysqldb
     required_python_packages: []
-    php_ini_settings:
-    - key: post_max_size
-      value: 512M
-    - key: upload_max_filesize
-      value: 512M
-    - key: max_execution_time
-      value: 600
-    - key: max_input_time
-      value: 600
-    apache_additional_modules:
-    - name: rewrite
-      state: present
-    apache_remove_default_vhost: False
 
   pre_tasks:
   - name: check for file custom_vars.yml
